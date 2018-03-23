@@ -16,7 +16,8 @@
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
 import logging
-import xmlrpclib
+from xmlrpc import client as xmlrpc_client
+
 
 class XMLRPCClient(object):
     """
@@ -30,7 +31,7 @@ class XMLRPCClient(object):
         self.baseurl = baseurl
         self.serviceurl = self.baseurl + '/plugins/webservices/xmlrpc.php'
         self.session = None
-        self.server = xmlrpclib.ServerProxy(self.serviceurl)
+        self.server = xmlrpc_client.ServerProxy(self.serviceurl)
         self.logger = logging.getLogger()
 
     def connect(self, login_name=None, login_password=None):
@@ -47,8 +48,8 @@ class XMLRPCClient(object):
         """
         if not None in [login_name, login_password]:
             params = {
-                'login_name':login_name,
-                'login_password':login_password,
+                'login_name': login_name,
+                'login_password': login_password,
             }
             response = self.server.glpi.doLogin(params)
 
@@ -84,7 +85,7 @@ class XMLRPCClient(object):
             if self.session:
                 params['session'] = self.session
 
-            params = dict(params.items() + kwargs.items())
+            params = {**params, **kwargs}
 
             called_module = getattr(self.server, module)
             return getattr(called_module, attr)(params)

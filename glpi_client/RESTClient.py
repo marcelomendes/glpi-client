@@ -15,10 +15,10 @@
 #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-
-import urllib, urllib2
 import json
 import logging
+from urllib import request, parse
+
 
 class RESTClient(object):
     """
@@ -49,11 +49,11 @@ class RESTClient(object):
 
         if not None in [login_name, login_password]:
             params = {
-                'method':'glpi.doLogin',
+                'method': 'glpi.doLogin',
                 'login_name': login_name,
                 'login_password': login_password,
             }
-            response = urllib2.urlopen(self.resturl + urllib.urlencode(params))
+            response = request.urlopen(self.resturl + parse.urlencode(params))
             result = json.loads(response.read())
             if 'session' in result:
                 self.session = result['session']
@@ -107,12 +107,12 @@ class RESTClient(object):
             if self.session:
                 params['session'] = self.session
 
-            params = dict(params.items() + kwargs.items())
+            params = {**params, **kwargs}
 
             if 'fields' in params:
                 params = treatFields(params)
 
-            response = urllib2.urlopen(self.resturl + urllib.urlencode(params))
+            response = request.urlopen(self.resturl + parse.urlencode(params))
             return json.loads(response.read())
 
         call.__name__ = attr
